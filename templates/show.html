@@ -1,58 +1,153 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <title>我的智慧極簡衣櫥</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
-        .clothing-item {
-            margin-bottom: 20px; padding-bottom: 15px;
-            border-bottom: 1px dashed #ccc; list-style-type: none;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .clothing-info { flex-grow: 1; }
-        .clothing-img { max-width: 100px; display: block; margin-top: 10px; border-radius: 8px; }
-        .add-form { background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        input { margin-bottom: 10px; padding: 5px; }
-        .btn-delete { background-color: #ff4d4d; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; }
-        .btn-add { background-color: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <h1>👗 我的智慧極簡衣櫥 (完整 CRUD 版)</h1>
+<meta charset="UTF-8">
+<title>智慧極簡衣櫥</title>
 
-    <!-- 🌟 新增衣服的表單 (這會把資料送到 /add) -->
-    <div class="add-form">
-        <h3>➕ 買新衣服了！加入衣櫥</h3>
+<style>
+body {
+    font-family: "Helvetica", sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+}
+
+.header {
+    background: #222;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+.form-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+input {
+    padding: 8px;
+    margin: 5px;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.add-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.card img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.tag {
+    font-size: 13px;
+    color: #666;
+}
+
+.delete-btn {
+    background: #ff4d4d;
+    color: white;
+    margin-top: 10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h1>👗 智慧極簡衣櫥</h1>
+    <p>你的 AI 穿搭助手</p>
+</div>
+
+<div class="container">
+
+    <!-- 穿搭推薦 -->
+<div class="form-box">
+    <h3>✨ 今日穿搭推薦</h3>
+
+    {% if items|length >= 2 %}
+        <p>我們幫你搭好了 👇</p>
+
+        <div style="display: flex; gap: 20px;">
+            <div>
+                <strong>{{ items[0].name }}</strong>
+                <p class="tag">{{ items[0].category }}</p>
+            </div>
+
+            <div>
+                <strong>{{ items[1].name }}</strong>
+                <p class="tag">{{ items[1].category }}</p>
+            </div>
+        </div>
+
+    {% else %}
+        <p>衣櫥太空了，先加入一些衣服吧！</p>
+    {% endif %}
+</div>
+
+    <!-- 新增 -->
+    <div class="form-box">
+        <h3>➕ 加入衣服</h3>
         <form action="/add" method="POST">
-            名稱：<input type="text" name="name" required placeholder="例如：純白 T 恤"><br>
-            種類：<input type="text" name="category" required placeholder="例如：上衣"><br>
-            顏色：<input type="text" name="color" placeholder="例如：白色"><br>
-            圖片網址：<input type="text" name="image_url" placeholder="貼上圖片連結 (可選)"><br>
-            <button type="submit" class="btn-add">放入衣櫥</button>
+            <input name="name" placeholder="名稱" required>
+            <input name="category" placeholder="種類" required>
+            <input name="color" placeholder="顏色">
+            <input name="image_url" placeholder="圖片網址">
+            <button class="add-btn">加入</button>
         </form>
     </div>
 
-    <ul>
+    <!-- 衣服 -->
+    <div class="grid">
         {% for item in items %}
-            <li class="clothing-item">
-                <div class="clothing-info">
-                    <strong>{{ item.name }}</strong> 
-                    (種類: {{ item.category }} | 顏色: {{ item.color }})
-                    
-                    {% if item.image_url %}
-                        <img src="{{ item.image_url }}" class="clothing-img">
-                    {% else %}
-                        <p style="color: gray; font-size: 0.9em;">這件衣服還沒有照片喔！</p>
-                    {% endif %}
-                </div>
+        <div class="card">
 
-                <!-- 🌟 刪除按鈕 (這會觸發 /delete/這件衣服的ID) -->
-                <form action="/delete/{{ item.id }}" method="POST" onsubmit="return confirm('確定要把這件衣服丟掉嗎？');">
-                    <button type="submit" class="btn-delete">🗑️ 丟掉</button>
-                </form>
-            </li>
+            {% if item.image_url %}
+            <img src="{{ item.image_url }}">
+            {% endif %}
+
+            <h3>{{ item.name }}</h3>
+
+            <p class="tag">👕 {{ item.category }}</p>
+            <p class="tag">🎨 {{ item.color }}</p>
+
+            <form action="/delete/{{ item.id }}" method="POST">
+                <button class="delete-btn">刪除</button>
+            </form>
+
+        </div>
         {% endfor %}
-    </ul>
+    </div>
+
+</div>
+
 </body>
 </html>
